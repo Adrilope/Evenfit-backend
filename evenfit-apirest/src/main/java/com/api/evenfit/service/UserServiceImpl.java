@@ -1,7 +1,13 @@
 package com.api.evenfit.service;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,11 +23,26 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor	// auto inject the repos
 @Transactional
 @Slf4j
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl implements UserService, UserDetailsService {
 	private final UserRepo userRepo;
 	
 	private final RoleRepo roleRepo;
 	
+
+	@Override
+	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+		User user = userRepo.findByEmail(email);
+		if (user == null) {
+			log.error("User not found");
+			throw new UsernameNotFoundException("User not found");
+		}
+		else {
+			log.info("User found in DB: {}", email);
+		}
+		Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
+		authorities.add(new SimpleGrantedAuthority(user.getRole().getName()));
+		return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), authorities);
+	}
 	
 	@Override
 	public User saveUser(User user) {
@@ -56,5 +77,4 @@ public class UserServiceImpl implements UserService {
 		log.info("Fetching all users");
 		return userRepo.findAll(); 
 	}
-
 }
