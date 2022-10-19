@@ -27,14 +27,14 @@ public class EvenfitApplication {
 	@Bean
 	CommandLineRunner run(UserService userService) {
 		return args -> {
-			userService.saveRole(new Role("ADMIN"));
-			userService.saveRole(new Role("USER"));
+			userService.saveRole(new Role("ROLE_ADMIN"));
+			userService.saveRole(new Role("ROLE_USER"));
 			
 			userService.saveUser(new User("admin@gmail.com", "1234", "admin", "surnames", 25, new Role()));
 			userService.saveUser(new User("adri@gmail.com", "1234", "adri", "Perez", 25, new Role()));
 			
-			userService.addRoleToUser("admin@gmail.com", "ADMIN");
-//			userService.addRoleToUser("adri@gmail.com", "USER");
+			userService.addRoleToUser("admin@gmail.com", "ROLE_ADMIN");
+//			userService.addRoleToUser("adri@gmail.com", "ROLE_USER");
 		};
 	}
 

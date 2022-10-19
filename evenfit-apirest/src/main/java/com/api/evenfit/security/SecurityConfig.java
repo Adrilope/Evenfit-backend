@@ -10,8 +10,11 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.http.HttpMethod;
 
 import com.api.evenfit.filter.CustomAuthenticationFilter;
+import com.api.evenfit.filter.CustomAuthorizationFilter;
 
 import lombok.RequiredArgsConstructor;
 
@@ -24,6 +27,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	
 	private final BCryptPasswordEncoder bCryptPasswordEncoder;
 	
+	private final JwtEntryPoint jwtEntryPoint;
+	
 	
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -32,10 +37,20 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
+		CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(authenticationManagerBean());
+		// new login endpoint
+		customAuthenticationFilter.setFilterProcessesUrl("/api/auth");
+		
 		http.csrf().disable();
 		http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-		http.authorizeHttpRequests().anyRequest().permitAll();
-		http.addFilter(new CustomAuthenticationFilter(authenticationManagerBean()));
+		http.authorizeRequests().antMatchers("/api/auth/**", "/api/renew/**").permitAll();
+		http.authorizeRequests().antMatchers(HttpMethod.GET, "/api/users/**").hasAnyAuthority("ROLE_USER");
+		http.authorizeRequests().antMatchers(HttpMethod.POST, "/api/user/save/**").hasAnyAuthority("ROLE_ADMIN");
+		http.authorizeRequests().anyRequest().authenticated();
+		
+		http.addFilter(customAuthenticationFilter);
+		http.addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);	// our custom filter and for what class is it
+		http.exceptionHandling().authenticationEntryPoint(jwtEntryPoint);
 	}
 	
 	@Bean
