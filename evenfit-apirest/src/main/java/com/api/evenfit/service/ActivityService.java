@@ -15,4 +15,6 @@ public interface ActivityService {
 	List<Activity> getActivities();
 	
 	Page<Activity> getActivities(Integer page);
+	
+	List<Activity> getSomeActivities();
 }

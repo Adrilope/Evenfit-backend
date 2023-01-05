@@ -46,5 +46,10 @@ public class ActivityServiceImpl implements ActivityService {
 		
 		return activityRepo.getActivities(pageRequest);
 	}
+
+	@Override
+	public List<Activity> getSomeActivities() {
+		return activityRepo.getSomeActivities(PageRequest.of(0,3));
+	}
 	
 }

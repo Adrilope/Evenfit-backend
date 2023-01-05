@@ -41,7 +41,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		// new login endpoint
 		customAuthenticationFilter.setFilterProcessesUrl("/api/auth");
 		
-		http.csrf().disable();
+//		http.csrf().disable();
 		http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 		http.authorizeRequests().antMatchers("/api/auth/**", "/api/renew/**", "/api/activities/**").permitAll();
 		http.authorizeRequests().antMatchers(HttpMethod.GET, "/api/users/**").hasAnyAuthority("ROLE_USER");
@@ -51,6 +51,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		http.addFilter(customAuthenticationFilter);
 		http.addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);	// our custom filter and for what class is it
 		http.exceptionHandling().authenticationEntryPoint(jwtEntryPoint);
+		
+		http.csrf().disable().cors().and().headers().frameOptions().disable();
 	}
 	
 	@Bean

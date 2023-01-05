@@ -16,7 +16,6 @@ import com.api.evenfit.service.ActivityService;
 import lombok.RequiredArgsConstructor;
 
 
-@CrossOrigin(origins = {"http://localhost:3000"})
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
@@ -29,6 +28,7 @@ public class ActivityController {
 		return ResponseEntity.ok().body(activityService.getActivities());
 	}
 	
+	@CrossOrigin(origins = {"http://localhost:3000"})
 	@GetMapping("/activities/page/{page}")
 	public ResponseEntity<Page<Activity>> getActivities(@PathVariable Integer page) {
 		return ResponseEntity.ok().body(activityService.getActivities(page));
@@ -38,5 +38,11 @@ public class ActivityController {
 	@GetMapping("/activities/{name}")
 	public ResponseEntity<Activity> getActivity(@PathVariable String name){
 		return ResponseEntity.ok().body(activityService.getActivity(name));
+	}
+	
+	@CrossOrigin(origins = {"http://localhost:3000"})
+	@GetMapping("/activities/some")
+	public ResponseEntity<List<Activity>> getSomeActivities() {
+		return ResponseEntity.ok().body(activityService.getSomeActivities());
 	}
 }
